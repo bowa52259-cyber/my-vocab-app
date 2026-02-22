@@ -1,4 +1,5 @@
 // ===== 1. 完整單字資料 (1-16) =====
+// 資料來源自使用者提供之 16 組單字表格
 const words = [
   { id: 1, word: "a / an", phonetic_us: "[ə] / [æn]", pos: "art.", meaning: "一個、每一、任一", synonyms: "", antonyms: "", phrases: "", sentence_pattern: "", grammar: "冠詞 a 用於以輔音字母開頭或不發音的 h 字母。", example: "I want to buy a new bag.", example_zh: "我想買個新包包。", familiarity: 0 },
   { id: 2, word: "able", phonetic_us: "[ˈebl]", pos: "adj.", meaning: "能夠的、會的", synonyms: "", antonyms: "unable", phrases: "be able to... 能夠...", sentence_pattern: "", grammar: "hasn't 是 has not 的縮寫。", example: "Jack hasn't been able to revise the article yet.", example_zh: "傑克還沒能修改這篇文章。", familiarity: 0 },
@@ -41,26 +42,14 @@ function saveProgress() {
 
 loadProgress();
 
-// ===== 自動發音主程式 (使用 Web Speech API) =====
+// ===== 3. 自動發音功能 (Web Speech API) =====
 function speak(text) {
-  // 1. 安全檢查：如果瀏覽器不支持發音則跳出
-  if (!window.speechSynthesis) {
-    console.log("您的瀏覽器不支持語音合成功能");
-    return;
-  }
-
-  // 2. 停止當前所有正在播放的聲音（避免多個單字疊在一起）
-  window.speechSynthesis.cancel();
-
-  // 3. 建立發音實體
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel(); 
   const utterance = new SpeechSynthesisUtterance(text);
-  
-  // 4. 設定細節參數
-  utterance.lang = 'en-US'; // 強制使用美式英語發音
-  utterance.rate = 0.85;    // 語速稍微調慢一點點（範圍 0.1 ~ 10），聽得更清楚
-  utterance.pitch = 1.0;    // 音調（範圍 0 ~ 2）
-
-  // 5. 執行朗讀
+  utterance.lang = 'en-US';
+  // 句子長度超過 20 個字元則稍微加快語速
+  utterance.rate = text.length > 20 ? 0.95 : 0.85; 
   window.speechSynthesis.speak(utterance);
 }
 
@@ -83,15 +72,19 @@ function renderCard() {
 
   if (!flipped) {
     card.innerHTML = `
-      <div style="font-size: 1rem; color: #888; margin-bottom: 10px;">點擊卡片翻面</div>
+      <div style="font-size: 0.9rem; color: #888; margin-bottom: 10px;">點擊翻面</div>
       <h2 style="font-size: 3rem; margin: 20px 0;">${word.word}</h2>
       <p style="text-align:center; font-size: 1.2rem; color: #444;">${word.phonetic_us}</p>
     `;
   } else {
+    // 處理例句中的單引號，避免 JS 報錯
+    const safeWord = word.word.replace(/'/g, "\\'");
+    const safeExample = word.example.replace(/'/g, "\\'");
+
     card.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="margin: 0;">${word.word}</h3>
-        <button onclick="event.stopPropagation(); speak('${word.word}')" style="margin:0; padding: 5px 10px; background: #673AB7; color:white;">🔊 朗讀</button>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <h3 style="margin: 0; color: #333;">${word.word}</h3>
+        <button onclick="event.stopPropagation(); speak('${safeWord}')" style="margin:0; padding: 5px 12px; background: #673AB7; color:white; border-radius: 20px; border:none; cursor:pointer;">🔊 單字</button>
       </div>
       <p><strong>音標：</strong>${word.phonetic_us}</p>
       <p><strong>詞性：</strong>${word.pos}</p>
@@ -101,23 +94,29 @@ function renderCard() {
       ${word.phrases ? `<p><strong>片語：</strong>${word.phrases}</p>` : ""}
       ${word.sentence_pattern ? `<p><strong>文法句型：</strong>${word.sentence_pattern}</p>` : ""}
       ${word.grammar ? `<p><strong>重點補充：</strong>${word.grammar}</p>` : ""}
-      <hr>
-      <p><em>${word.example}</em></p>
-      <p>${word.example_zh}</p>
+      <hr style="border: 0.5px solid #eee; margin: 15px 0;">
+      <div style="display: flex; align-items: flex-start; gap: 10px; background: #f9f9f9; padding: 10px; border-radius: 8px;">
+        <div style="flex: 1;">
+          <p style="margin: 0; color: #2c3e50;"><em>${word.example}</em></p>
+          <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #666;">${word.example_zh}</p>
+        </div>
+        <button onclick="event.stopPropagation(); speak('${safeExample}')" style="margin:0; padding: 5px 10px; font-size: 12px; background: #2196F3; color:white; border-radius: 5px; border:none; cursor:pointer; white-space: nowrap;">🔊 唸例句</button>
+      </div>
     `;
   }
   updateStats();
 }
+
 function flipCard() {
   flipped = !flipped;
-  renderCard(); // 先執行畫面的翻轉
+  renderCard();
   
-  // 判斷：如果是翻到背面（顯示中文與例句時），就自動讀出單字
+  // 翻面時自動唸出單字
   if (flipped) {
-    const currentWordObject = words[currentIndex];
-    speak(currentWordObject.word); // 呼叫剛才寫好的發音主程式
+    speak(words[currentIndex].word);
   }
 }
+
 function nextWord() {
   currentIndex = getNextIndex();
   flipped = false;
@@ -142,7 +141,5 @@ function updateStats() {
     progressPercent + "%";
 }
 
-// 初始化
+// 初始化啟動
 renderCard();
-
-
