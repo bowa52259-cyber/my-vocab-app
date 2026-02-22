@@ -41,12 +41,26 @@ function saveProgress() {
 
 loadProgress();
 
-// ===== 3. 自動發音功能 (Web Speech API) =====
+// ===== 自動發音主程式 (使用 Web Speech API) =====
 function speak(text) {
-  window.speechSynthesis.cancel(); // 停止目前正在播放的聲音
+  // 1. 安全檢查：如果瀏覽器不支持發音則跳出
+  if (!window.speechSynthesis) {
+    console.log("您的瀏覽器不支持語音合成功能");
+    return;
+  }
+
+  // 2. 停止當前所有正在播放的聲音（避免多個單字疊在一起）
+  window.speechSynthesis.cancel();
+
+  // 3. 建立發音實體
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'en-US'; // 設定為美式英文
-  utterance.rate = 0.9;     // 語速稍慢
+  
+  // 4. 設定細節參數
+  utterance.lang = 'en-US'; // 強制使用美式英語發音
+  utterance.rate = 0.85;    // 語速稍微調慢一點點（範圍 0.1 ~ 10），聽得更清楚
+  utterance.pitch = 1.0;    // 音調（範圍 0 ~ 2）
+
+  // 5. 執行朗讀
   window.speechSynthesis.speak(utterance);
 }
 
@@ -131,3 +145,4 @@ function updateStats() {
 
 // 初始化
 renderCard();
+
