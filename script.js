@@ -108,17 +108,16 @@ function renderCard() {
   }
   updateStats();
 }
-
 function flipCard() {
   flipped = !flipped;
-  renderCard();
+  renderCard(); // 先執行畫面的翻轉
   
-  // 翻面顯示意思時，自動發音一次
+  // 判斷：如果是翻到背面（顯示中文與例句時），就自動讀出單字
   if (flipped) {
-    speak(words[currentIndex].word);
+    const currentWordObject = words[currentIndex];
+    speak(currentWordObject.word); // 呼叫剛才寫好的發音主程式
   }
 }
-
 function nextWord() {
   currentIndex = getNextIndex();
   flipped = false;
@@ -145,4 +144,5 @@ function updateStats() {
 
 // 初始化
 renderCard();
+
 
