@@ -1,4 +1,4 @@
-// ===== 1. 完整單字資料 (1-16) =====
+// ===== 1. 完整單字資料 (1-34) =====
 const words = [
   { id: 1, word: "a / an", phonetic_us: "[ə] / [æn]", pos: "art.", meaning: "一個、每一、任一", synonyms: "", antonyms: "", phrases: "", sentence_pattern: "", grammar: "冠詞 a 用於以輔音字母開頭或不發音的 h 字母。", example: "I want to buy a new bag.", example_zh: "我想買個新包包。", familiarity: 0 },
   { id: 2, word: "able", phonetic_us: "[ˈebl]", pos: "adj.", meaning: "能夠的、會的", synonyms: "", antonyms: "unable", phrases: "be able to... 能夠...", sentence_pattern: "", grammar: "hasn't 是 has not 的縮寫。", example: "Jack hasn't been able to revise the article yet.", example_zh: "傑克還沒能修改這篇文章。", familiarity: 0 },
@@ -162,4 +162,5 @@ function updateStats() {
 }
 
 renderCard();
+
 
