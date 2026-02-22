@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Vocabulary App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>📘 My Vocabulary App</h1>
+
+  <div id="stats"></div>
+
+  <div class="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <div class="card" onclick="flipCard()">
+    <div id="card-content"></div>
+  </div>
+
+  <div class="buttons">
+    <button onclick="updateFamiliarity(2)">熟悉</button>
+    <button onclick="updateFamiliarity(1)">普通</button>
+    <button onclick="updateFamiliarity(0)">不熟</button>
+  </div>
+
+  <button onclick="nextWord()">下一題</button>
+
+  <script src="script.js"></script>
+</body>
+</html>
